@@ -1,0 +1,51 @@
+#include <Servo.h>
+
+const int trigPin = 9;   // Pin de control del sensor ultrasónico
+const int echoPin = 10;  // Pin de lectura del sensor ultrasónico
+Servo miServo;           // Objeto del servo
+
+void setup() {
+  Serial.begin(9600);
+  miServo.attach(8);      // El pin de control del servo
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+}
+
+void loop() {
+  // Generar pulso ultrasónico
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Medir el tiempo de vuelo del eco
+  long duration = pulseIn(echoPin, HIGH);
+
+  // Calcular la distancia en centímetros
+  int distance = duration * 0.034 / 2;
+
+  Serial.print("Distancia: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Controlar el servo basado en la distancia
+  if (distance >= 0 && distance <= 30) {
+    miServo.write(90);  // Gira el servo a 90 grados
+    delay(1000);        // Espera 1 segundo
+    miServo.write(0);   // Vuelve a la posición inicial (0 grados)
+    delay(1000);        // Espera 1 segundo
+
+    miServo.write(30);  // Sube a 30 grados
+    delay(1000);        // Espera 1 segundo
+    miServo.write(0);   // Vuelve a la posición inicial (0 grados)
+    delay(1000);        // Espera 1 segundo
+
+    miServo.write(30);  // Sube a 30 grados nuevamente
+    delay(1000);        // Espera 1 segundo
+    miServo.write(0);   // Vuelve a la posición inicial (0 grados)
+    delay(1000);        // Espera 1 segundo antes de la próxima medición
+  }
+
+  delay(500);  // Esperar un poco entre lecturas
+}
